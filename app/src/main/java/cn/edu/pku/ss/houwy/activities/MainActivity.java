@@ -1,5 +1,6 @@
 package cn.edu.pku.ss.houwy.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
@@ -32,6 +33,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView cityTv, humidityTv, windTv,climateTv,qualityTv,pm2_5Tv,temperatureTv;
     private ImageView climateImg,cityImg;
 
+    //定义按钮
+    private ImageView mSearchBtn;
+
 
 
     private Handler mHandler = new Handler() {
@@ -52,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.weather_info);
         mUpdateBtn = (ImageView) findViewById(R.id.navigation_update_btn);
         mUpdateBtn.setOnClickListener(this);
+        mSearchBtn = (ImageView) findViewById(R.id.bottom_navigation_search);
+        mSearchBtn.setOnClickListener(this);
+
         initView();
 
 
@@ -79,6 +86,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("myWeather","网络ok");
                 Toast.makeText(MainActivity.this,"网络Ok",Toast.LENGTH_LONG).show();
                 queryWeatherCode(cityCode);
+            }
+            else{
+                Log.d("myWeather","网络挂了");
+                Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
+            }
+        }
+        else if(view.getId() == R.id.bottom_navigation_search){
+            Intent intent = new Intent(this,CitySearchActivity.class);
+            startActivityForResult(intent,1);
+        }
+    }
+
+
+    //获取CitySearchActivity页面传来的citycode
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if(requestCode == 1 && resultCode == RESULT_OK){
+            String newCityCode = data.getStringExtra("new_city_code");
+            if(NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE){
+                Log.d("myWeather","网络ok");
+                Toast.makeText(MainActivity.this,"网络Ok",Toast.LENGTH_LONG).show();
+                queryWeatherCode(newCityCode);
             }
             else{
                 Log.d("myWeather","网络挂了");
