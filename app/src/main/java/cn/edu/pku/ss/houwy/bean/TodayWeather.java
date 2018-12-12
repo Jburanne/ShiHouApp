@@ -10,6 +10,15 @@ public class TodayWeather {
     private String temperature;
     private String tem_low;
     private String tem_high;
+    private String cityCode;
+
+    public String getCityCode() {
+        return cityCode;
+    }
+
+    public void setCityCode(String cityCode) {
+        this.cityCode = cityCode;
+    }
 
     public String getCity() {
         return city;

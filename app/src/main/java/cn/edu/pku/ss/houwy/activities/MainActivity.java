@@ -2,6 +2,7 @@ package cn.edu.pku.ss.houwy.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
@@ -14,8 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -215,10 +218,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qualityTv.setText(todayWeather.getQuality());
         temperatureTv.setText(todayWeather.getTemperature());
         setWeatherImg(todayWeather.getClimate(),climateImg);
+        //更新省份地图
+        String provinceSrc = "p_" + todayWeather.getCityCode().substring(0,5);
+        Class aClass = R.drawable.class;
+        int provinceId = -1;
+        try {
+            Field field = aClass.getField(provinceSrc);
+            Object value = field.get(new Integer(0));
+            provinceId = (int)value;
+
+        } catch (Exception e) {
+            if(provinceId == -1){
+               cityImg.setImageResource(R.drawable.p_10101);
+            }
+            //e.printStackTrace();
+
+        }finally {
+            Drawable drawable = getResources().getDrawable(provinceId);
+            cityImg.setImageDrawable(drawable);
+        }
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
     }
 
-    public void queryWeatherCode(String cityCode) {
+    public void queryWeatherCode(final String cityCode) {
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         Log.d("myWeather", address);
         new Thread(new Runnable() {
@@ -243,6 +265,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String responseStr = response.toString();
                     Log.d("myWeather", responseStr);
                     todayWeather = NetUtil.parseXML(responseStr);
+                    //向todayWeather中传入citycode
+                    todayWeather.setCityCode(cityCode);
                     if(todayWeather != null){
                         Message msg = new Message();
                         msg.what = MainActivity.UPDATE_TODAY_WEATHER;
