@@ -35,7 +35,7 @@ public class CityDB {
         return list;
     }
 
-    //模糊匹配
+    //根据搜索框输入内容模糊匹配城市
     public List<City> getSearchResult(String str){
         List<City> list = new ArrayList<City>();
         Cursor c = db.rawQuery("SELECT * from "+CITY_TABLE_NAME +" WHERE city like '%"+str+"%'",null);
@@ -50,5 +50,15 @@ public class CityDB {
             list.add(item);
         }
         return list;
+    }
+
+    //根据城市名获取城市编码
+    public String getCitycodeByCityname(String cName){
+        String citycode = "";
+        Cursor c = db.rawQuery("SELECT number from " + CITY_TABLE_NAME + " WHERE city='" + cName +"'",null);
+        while(c.moveToNext()){
+            citycode = c.getString(c.getColumnIndex("number"));
+        }
+        return citycode;
     }
 }

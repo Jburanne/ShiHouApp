@@ -20,6 +20,7 @@ public class MyApplication extends Application {
     private CityDB mCityDB;
     private List<City> mCityList;
     private List<City> mResultList;
+    private String cityCode;
 
     @Override
     public void onCreate() {
@@ -40,6 +41,7 @@ public class MyApplication extends Application {
         }).start();
     }
 
+    //获取所有的城市列表
     private boolean prepareCityList(){
         mCityList = mCityDB.getAllCity();
         int i = 0;
@@ -53,6 +55,7 @@ public class MyApplication extends Application {
         return true;
     }
 
+    //获取str模糊匹配后得到的城市列表
     public List<City> getResultList(String str){
         mResultList = mCityDB.getSearchResult(str);
         int i = 0;
@@ -64,6 +67,13 @@ public class MyApplication extends Application {
         }
         return mResultList;
     }
+
+    //获取城市cName的cityCode
+    public String getCityCode(String cName){
+        cityCode = mCityDB.getCitycodeByCityname(cName);
+        return cityCode;
+    }
+
 
     public List<City> getCityList(){
         return mCityList;

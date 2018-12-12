@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    //获取CitySearchActivity页面传来的citycode
+    //（CitySearchActivity销毁后，会回调这个方法）获取CitySearchActivity页面传来的citycode
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
 
         if(requestCode == 1 && resultCode == RESULT_OK){

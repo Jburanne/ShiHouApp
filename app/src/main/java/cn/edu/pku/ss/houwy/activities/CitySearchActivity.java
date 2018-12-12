@@ -1,19 +1,23 @@
 package cn.edu.pku.ss.houwy.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +27,7 @@ import cn.edu.pku.ss.houwy.app.MyApplication;
 import cn.edu.pku.ss.houwy.bean.City;
 import cn.edu.pku.ss.houwy.shihou.R;
 
-public class CitySearchActivity extends AppCompatActivity implements View.OnClickListener,SearchView.OnQueryTextListener{
+public class CitySearchActivity extends AppCompatActivity implements View.OnClickListener,SearchView.OnQueryTextListener,AdapterView.OnItemClickListener{
     //定义返回按钮
     private ImageView mbackBtn;
     //定义热门城市按钮
@@ -34,21 +38,13 @@ public class CitySearchActivity extends AppCompatActivity implements View.OnClic
     //定义ListView
     private ListView searchLv;
 
-    //定义搜索结果，只放城市名
-    private ArrayList<String> mSearchResult = new ArrayList<>();
-    //定义城市名到编码的映射
-    private Map<String,String> nameToCode = new HashMap<>();
-    //定义城市名到拼音的映射
-    private Map<String,String> nameToPinyin = new HashMap<>();
-
-    //private ArrayAdapter arrayAdapter = new ArrayAdapter();
-
-    Context context;
-
     private ArrayAdapter mAdapter;
     private ArrayList<City> cityList;
     private ArrayList<String> data;
     private static MyApplication myApplication;
+
+    //定义ListView中被点中的城市对应的编码
+    String selectedCityCode;
 
 
 
@@ -56,12 +52,13 @@ public class CitySearchActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.city_search);
-        context = this;
         initViews();
         setBtnOnclick();
         searchSv.setOnQueryTextListener(this);
+        searchLv.setOnItemClickListener(this);
     }
 
+    //初始化
     public void initViews(){
         mbackBtn = (ImageView) findViewById(R.id.city_search_back);
         bjBtn = (Button) findViewById(R.id.beijing_btn);
@@ -77,6 +74,7 @@ public class CitySearchActivity extends AppCompatActivity implements View.OnClic
         searchLv = (ListView) findViewById(R.id.city_searchLv);
     }
 
+    //为按钮们设置点击事件
     public void setBtnOnclick(){
         mbackBtn.setOnClickListener(this);
         bjBtn.setOnClickListener(this);
@@ -97,7 +95,8 @@ public class CitySearchActivity extends AppCompatActivity implements View.OnClic
             case(R.id.city_search_back):
                 finish();
                 break;
-            case(R.id.beijing_btn):
+            //如果点击了热门城市，传回热门城市的编码
+            case (R.id.beijing_btn):
                 newCityCode = "101010100";
                 break;
             case(R.id.shanghai_btn):
@@ -127,49 +126,40 @@ public class CitySearchActivity extends AppCompatActivity implements View.OnClic
             default:
                 break;
         }
-
         Intent intent = new Intent();
         intent.putExtra("new_city_code", newCityCode);
         setResult(RESULT_OK, intent);
         finish();
 
-            //更新主页面的默认城市
-//            SharedPreferences.Editor editor = getSharedPreferences("config",MODE_PRIVATE).edit();
-//            editor.putString("main_city_code","101010100");
-//            editor.apply();
+//        更新主页面的默认城市
+//        SharedPreferences.Editor editor = getSharedPreferences("config", MODE_PRIVATE).edit();
+//        editor.putString("main_city_code", "101010100");
+//        editor.apply();
     }
-
-
-
     @Override
     public boolean onQueryTextChange(String newText) {
         if(!TextUtils.isEmpty(newText)){
-            showListView(newText);
-            Log.d("test","test");
-//            if(mSearchResult != null){
-//                mSearchResult.clear();
-//            }
-//            for(String str : nameToPinyin.keySet()){
-//                if(str.contains(newText)||nameToPinyin.get(str).contains(newText)){
-//                    mSearchResult.add(str);
-//                }
-//            }
-            //arrayAdapter.notifyDataSetChanged();
+            showListView(newText); //如果搜索框内有文字，显示ListView
+        }
+        else{
+            searchLv.setVisibility(View.GONE); // 如果搜索框内为空，ListView消失
         }
         return false;
     }
     private void showListView(String str){
+        //把ListView设为可见
         searchLv.setVisibility(View.VISIBLE);
+        //根据搜索框内已输入的文字模糊匹配数据库中的城市名
         cityList = new ArrayList<City>(myApplication.getInstance().getResultList(str));
-        data = new ArrayList<String>();//构建城市名的一个列表
+        //构建城市名的一个列表
+        data = new ArrayList<String>();
         for(City s:cityList){
-            data.add(s.getCity());//通过citylist获取数据
+            data.add(s.getCity());
             Log.d("test",s.getCity());
         }
-        //绑定
+        //将数据绑定到ListView
         mAdapter = new ArrayAdapter<String>(CitySearchActivity.this,android.R.layout.simple_list_item_1,data);
-        searchLv.setAdapter(mAdapter);//绑定
-        //searchLv.setTextFilterEnabled(true);//开启过滤功能
+        searchLv.setAdapter(mAdapter);
     }
 
     @Override
@@ -178,4 +168,40 @@ public class CitySearchActivity extends AppCompatActivity implements View.OnClic
     }
 
 
+    //设置listView点击事件
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        //设置提醒框
+        AlertDialog.Builder builder = new AlertDialog.Builder(CitySearchActivity.this);
+        builder.setTitle("提醒");
+
+        String cityName;
+
+        //获取点击位置的城市名
+        cityName = String.valueOf(mAdapter.getItem(position));
+        Log.d("cityName",cityName);
+        //获取城市名对应的城市编码
+        selectedCityCode = myApplication.getInstance().getCityCode(cityName);
+        Log.d("test",selectedCityCode);
+        //跳出提示语句
+        builder.setMessage("你确定要将城市切换至"+cityName+"吗？");
+        //如果点击的是取消键
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                    //直接消掉dialog
+            }
+        });
+        //如果点击的是确定键
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent i = new Intent(CitySearchActivity.this,MainActivity.class).putExtra("new_city_code",selectedCityCode);
+                setResult(RESULT_OK, i);
+                finish();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 }
