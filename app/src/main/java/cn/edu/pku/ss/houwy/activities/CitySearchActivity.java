@@ -44,7 +44,7 @@ public class CitySearchActivity extends AppCompatActivity implements View.OnClic
     private static MyApplication myApplication;
 
     //定义ListView中被点中的城市对应的编码
-    String selectedCityCode;
+    public String selectedCityCode;
 
 
 

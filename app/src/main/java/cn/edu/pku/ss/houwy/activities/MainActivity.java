@@ -36,9 +36,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView cityTv, humidityTv, windTv,climateTv,qualityTv,pm2_5Tv,temperatureTv;
     private ImageView climateImg,cityImg;
 
-    //定义按钮
+    //定义搜索按钮
     private ImageView mSearchBtn;
+    //定义关注城市按钮
+    private ImageView mLikesBtn;
 
+    private int[] future_high = {0,0,0,0,0,0};
+    private int[] future_low = {0,0,0,0,0,0};
 
 
     private Handler mHandler = new Handler() {
@@ -61,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mUpdateBtn.setOnClickListener(this);
         mSearchBtn = (ImageView) findViewById(R.id.bottom_navigation_search);
         mSearchBtn.setOnClickListener(this);
+        mLikesBtn = (ImageView) findViewById(R.id.bottom_navigation_likes);
+        mLikesBtn.setOnClickListener(this);
 
         initView();
 
@@ -98,6 +104,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if(view.getId() == R.id.bottom_navigation_search){
             Intent intent = new Intent(this,CitySearchActivity.class);
             startActivityForResult(intent,1);
+        }
+        else if(view.getId() == R.id.bottom_navigation_likes){
+            Intent intent = new Intent(this,FutureWeather.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("future_high",future_high);
+            bundle.putSerializable("future_low",future_low);
+            intent.putExtra("bundle",bundle);
+            //intent.putIntegerArrayListExtra("future_low",future_low);
+            startActivity(intent);
         }
     }
 
@@ -267,6 +282,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     todayWeather = NetUtil.parseXML(responseStr);
                     //向todayWeather中传入citycode
                     todayWeather.setCityCode(cityCode);
+                    //从todayWeather中得到未来天气信息
+                    future_high = todayWeather.getFuture_high();
+                    future_low = todayWeather.getFuture_low();
                     if(todayWeather != null){
                         Message msg = new Message();
                         msg.what = MainActivity.UPDATE_TODAY_WEATHER;

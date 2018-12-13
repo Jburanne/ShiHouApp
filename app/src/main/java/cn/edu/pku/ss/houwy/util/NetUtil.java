@@ -51,12 +51,17 @@ public class NetUtil {
     public static TodayWeather parseXML(String xmldata) {
         TodayWeather todayWeather = null;
 
-        int fengxiangCount = 0;
-        int fengliCount = 0;
-        int dateCount = 0;
-        int highCount = 0;
-        int lowCount = 0;
-        int typeCount = 0;
+        int dateCount = 1;
+        int highCount = 1;
+        int lowCount = 1;
+        int typeCount = 1;
+        int typeCount1 = 1;
+        int flag = 1;
+        String[] temp_weekday = new String[6];
+        String[] temp_day = new String[6];
+        int[] temp_high = new int[6];
+        int[] temp_low = new int[6];
+        String[] temp_type = new String[6];
         try {
             XmlPullParserFactory fac = XmlPullParserFactory.newInstance();
             XmlPullParser xmlPullParser = fac.newPullParser();
@@ -94,35 +99,91 @@ public class NetUtil {
                                 eventType = xmlPullParser.next();
                                 todayWeather.setQuality(xmlPullParser.getText());
                                 //Log.d("myWeather", "quality: " + xmlPullParser.getText());
-                            } else if (xmlPullParser.getName().equals("fengxiang") && fengxiangCount == 0) {
+                            } else if (xmlPullParser.getName().equals("fengxiang")) {
                                 eventType = xmlPullParser.next();
                                 //Log.d("myWeather", "fengxiang: " + xmlPullParser.getText());
-                                fengxiangCount++;
-                            } else if (xmlPullParser.getName().equals("fengli") && fengliCount == 0) {
+                            } else if (xmlPullParser.getName().equals("fengli")) {
                                 eventType = xmlPullParser.next();
                                 todayWeather.setWind(xmlPullParser.getText());
                                 //Log.d("myWeather", "fengli: " + xmlPullParser.getText());
-                                fengliCount++;
-                            } else if (xmlPullParser.getName().equals("date") && dateCount == 0) {
+                            }else if(xmlPullParser.getName().equals("date_1")){
                                 eventType = xmlPullParser.next();
-                                //Log.d("myWeather", "date: " + xmlPullParser.getText());
-                                dateCount++;
-                            } else if (xmlPullParser.getName().equals("high") && highCount == 0) {
-                                eventType = xmlPullParser.next();
-                                todayWeather.setTem_high(xmlPullParser.getText());
-                                //Log.d("myWeather", "high: " + xmlPullParser.getText());
-                                highCount++;
-                            } else if (xmlPullParser.getName().equals("low") && lowCount == 0) {
-                                eventType = xmlPullParser.next();
-                                todayWeather.setTem_low(xmlPullParser.getText());
-                                //Log.d("myWeather", "low: " + xmlPullParser.getText());
-                                lowCount++;
-                            } else if (xmlPullParser.getName().equals("type") && typeCount == 0) {
-                                eventType = xmlPullParser.next();
-                                todayWeather.setClimate(xmlPullParser.getText());
-                                //Log.d("myWeather", "type: " + xmlPullParser.getText());
-                                typeCount++;
+                                //存入昨天的日期信息
+                                String temp_date;
+                                int length;
+                                temp_date = xmlPullParser.getText();
+                                length = temp_date.length();
+                                temp_day[0] = temp_date.substring(0,length-3);
+                                temp_weekday[0] = temp_date.substring(length-3,length);
                             }
+                            else if (xmlPullParser.getName().equals("date")) {
+                                eventType = xmlPullParser.next();
+                                String temp_date;
+                                int length;
+                                temp_date = xmlPullParser.getText();
+                                length = temp_date.length();
+                                temp_day[dateCount] = temp_date.substring(0,length-3);
+                                temp_weekday[dateCount] = temp_date.substring(length-3,length);
+                                //如果是今天的信息，则存入今日信息的属性中
+                                if(dateCount == 1){
+                                    todayWeather.setDay(temp_day[1]);
+                                    todayWeather.setWeekday(temp_weekday[1]);
+                                }
+                                dateCount++;
+                            } else if(xmlPullParser.getName().equals("high_1")){
+                                eventType = xmlPullParser.next();
+                                //存入昨天的最高温度
+                                String temp = xmlPullParser.getText().split(" ")[1];
+                                temp_high[0] = Integer.parseInt(temp.substring(0,temp.length()-1));
+                            } else if (xmlPullParser.getName().equals("high")) {
+                                eventType = xmlPullParser.next();
+                                //如果是今天的信息，则存入今日信息的属性中
+                                if(highCount == 1){
+                                    todayWeather.setTem_high(xmlPullParser.getText().split(" ")[1]);
+                                }
+                                String temp = xmlPullParser.getText().split(" ")[1];
+                                temp_high[highCount] = Integer.parseInt(temp.substring(0,temp.length()-1));
+                                highCount++;
+                            }else if(xmlPullParser.getName().equals("low_1")){
+                                eventType = xmlPullParser.next();
+                                //存入昨天的最高温度
+                                String temp = xmlPullParser.getText().split(" ")[1];
+                                temp_low[0] = Integer.parseInt(temp.substring(0,temp.length()-1));
+                            } else if (xmlPullParser.getName().equals("low")) {
+                                eventType = xmlPullParser.next();
+                                //如果是今天的信息，则存入今日信息的属性中
+                                if(lowCount == 1){
+                                    todayWeather.setTem_low(xmlPullParser.getText().split(" ")[1]);
+                                }
+                                String temp = xmlPullParser.getText().split(" ")[1];
+                                temp_low[lowCount] = Integer.parseInt(temp.substring(0,temp.length()-1));
+                                lowCount++;
+                            } else if(xmlPullParser.getName().equals("type_1")){
+                                eventType = xmlPullParser.next();
+                                //存入昨天的天气类型
+                                temp_type[0] = xmlPullParser.getText();
+                            } else if (xmlPullParser.getName().equals("type")) {
+                                eventType = xmlPullParser.next();
+                                if(flag == 1){
+                                    //如果是今天的信息，则存入今日信息的属性中
+                                    if(typeCount == 1){
+                                        todayWeather.setClimate(xmlPullParser.getText());
+                                    }
+                                    temp_type[typeCount] = xmlPullParser.getText();
+                                }
+                                typeCount1++;
+                                if(typeCount1%2 == 0){
+                                    flag = 0;
+                                }else{
+                                    flag = 1;
+                                    typeCount++;
+                                }
+                            }
+                            todayWeather.setFuture_day(temp_day);
+                            todayWeather.setFuture_high(temp_high);
+                            todayWeather.setFuture_low(temp_low);
+                            todayWeather.setFuture_type(temp_type);
+                            todayWeather.setFuture_weekday(temp_weekday);
                         }
                         break;
                     // 判断当前事件是否为标签元素结束事件
