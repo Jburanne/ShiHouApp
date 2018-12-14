@@ -170,11 +170,4 @@ public class TodayWeather {
         this.tem_high = tem_high;
     }
 
-
-
-
-
-
-
-
 }

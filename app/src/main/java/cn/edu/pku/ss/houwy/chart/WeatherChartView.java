@@ -58,20 +58,19 @@ public class WeatherChartView extends View {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WeatherChartView);
         float densityText = getResources().getDisplayMetrics().scaledDensity;
         mTextSize = a.getDimensionPixelSize(R.styleable.WeatherChartView_textSize,
-                (int) (14 * densityText));
-        mColorHigh = a.getColor(R.styleable.WeatherChartView_dayColor,
-                getResources().getColor(R.color.colorAccent));
+                (int) (18 * densityText));
+        mColorHigh = a.getColor(R.styleable.WeatherChartView_dayColor, getResources().getColor(R.color.colorAccent));
         mColorLow = a.getColor(R.styleable.WeatherChartView_nightColor,
                 getResources().getColor(R.color.colorPrimary));
-        mTextColor = a.getColor(R.styleable.WeatherChartView_textColor, Color.WHITE);
+        mTextColor = a.getColor(R.styleable.WeatherChartView_textColor, Color.DKGRAY);
         //回收TypedArray
         a.recycle();
         mDensity = getResources().getDisplayMetrics().density;
-        mRadius = 3 * mDensity;
-        mRadiusToday = 5 * mDensity;
+        mRadius = 6 * mDensity;
+        mRadiusToday = 8 * mDensity;
         mSpace = 3 * mDensity;
         mTextSpace = 10 * mDensity;
-        mStokeWidth = 2 * mDensity;
+        mStokeWidth = 4 * mDensity;
     }
 
     public WeatherChartView(Context context) {
