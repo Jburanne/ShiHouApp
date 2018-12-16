@@ -3,14 +3,17 @@ package cn.edu.pku.ss.houwy.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +25,7 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import cn.edu.pku.ss.houwy.app.MyApplication;
 import cn.edu.pku.ss.houwy.bean.TodayWeather;
 import cn.edu.pku.ss.houwy.shihou.R;
 import cn.edu.pku.ss.houwy.util.NetUtil;
@@ -41,6 +45,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //定义关注城市按钮
     private ImageView mLikesBtn;
 
+    //定义relativelayout以实现背景切换
+    private RelativeLayout RLbackground;
+
     //未来天气：最高最低温度
     private int[] future_high = {0,0,0,0,0,0};
     private int[] future_low = {0,0,0,0,0,0};
@@ -54,8 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //未来天气：城市
     private String future_city;
 
+    private static MyApplication myApplication;
+
 
     private Handler mHandler = new Handler() {
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case UPDATE_TODAY_WEATHER:
@@ -77,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSearchBtn.setOnClickListener(this);
         mLikesBtn = (ImageView) findViewById(R.id.bottom_navigation_likes);
         mLikesBtn.setOnClickListener(this);
-
         initView();
 
 
@@ -159,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qualityTv = (TextView) findViewById(R.id.quality_tv);
         temperatureTv = (TextView) findViewById(R.id.temperature_tv);
         cityImg = (ImageView) findViewById(R.id.location_img);
+        RLbackground = (RelativeLayout)findViewById(R.id.main_activity_xml);
+        RLbackground.setBackgroundResource(R.drawable.food_bg_paomian);
 
         cityTv.setText("N/A");
         humidityTv.setText("N/A");
@@ -238,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void updateTodayWeather(TodayWeather todayWeather){
         cityTv.setText(todayWeather.getCity());
         humidityTv.setText(todayWeather.getHumidity());
@@ -266,6 +278,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Drawable drawable = getResources().getDrawable(provinceId);
             cityImg.setImageDrawable(drawable);
         }
+        //根据温度更新背景食物图片
+        String foodSrc = myApplication.getInstance().getBackgroundByTemperature(todayWeather.getTemperature());
+        int foodId = -1;
+        try {
+            Field fField = aClass.getField(foodSrc);
+            Object mValue = fField.get(new Integer(0));
+            foodId = (int)mValue;
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            Drawable drawable = getResources().getDrawable(foodId);
+            RLbackground.setBackground(drawable);
+        }
+
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
     }
 
