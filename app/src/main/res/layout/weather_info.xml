@@ -145,15 +145,22 @@
             android:layout_width="45dip"
             android:layout_height="45dip"
             android:src="@drawable/bottom_weather"
-            android:layout_marginLeft="100px"/>
+            android:layout_marginLeft="80px"/>
+        <ImageView
+            android:id="@+id/bottom_navigation_future"
+            android:layout_width="45dip"
+            android:layout_height="45dip"
+            android:src="@drawable/bottom_future"
+            android:layout_toRightOf="@id/bottom_navigation_weather"
+            android:layout_marginLeft="80px"/>
 
         <ImageView
             android:id="@+id/bottom_navigation_search"
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:src="@drawable/bottom_search"
-            android:layout_toRightOf="@id/bottom_navigation_weather"
-            android:layout_marginLeft="161px"/>
+            android:layout_toRightOf="@id/bottom_navigation_future"
+            android:layout_marginLeft="80px"/>
 
         <ImageView
             android:id="@+id/bottom_navigation_likes"
@@ -161,6 +168,6 @@
             android:layout_height="45dip"
             android:src="@drawable/bottom_likes"
             android:layout_toRightOf="@id/bottom_navigation_search"
-            android:layout_marginLeft="161px"/>
+            android:layout_marginLeft="80px"/>
     </RelativeLayout>
 </RelativeLayout>

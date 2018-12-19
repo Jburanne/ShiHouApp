@@ -22,7 +22,9 @@
         </activity>
         <activity android:name="cn.edu.pku.ss.houwy.activities.CitySearchActivity" />
         <activity android:name="cn.edu.pku.ss.houwy.MyApplication.MyApplication" />
-        <activity android:name="cn.edu.pku.ss.houwy.activities.FutureWeather"></activity>
+        <activity android:name="cn.edu.pku.ss.houwy.activities.FutureWeather" />
+        <activity android:name="cn.edu.pku.ss.houwy.activities.CityLikes" />
+        <activity android:name="cn.edu.pku.ss.houwy.activities.SearchFavouriteCity"></activity>
     </application>
 
 </manifest>

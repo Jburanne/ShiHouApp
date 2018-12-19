@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="like_city_1" type="id"/>
+    <item name="like_city_2" type="id"/>
+    <item name="like_city_3" type="id"/>
+    <item name="like_city_4" type="id"/>
+    <item name="like_city_5" type="id"/>
+</resources>

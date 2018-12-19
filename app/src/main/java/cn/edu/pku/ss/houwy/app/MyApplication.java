@@ -94,6 +94,13 @@ public class MyApplication extends Application {
         return "bg3";
     }
 
+    //返回当前关注的城市列表
+    public List<String> getCityLike(){
+        List<String> city = new ArrayList<>();
+        city = mFoodDB.getFavouriteCity();
+        return city;
+    }
+
 
     public List<City> getCityList(){
         return mCityList;

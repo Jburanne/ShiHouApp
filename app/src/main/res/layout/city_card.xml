@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/add_city"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/city_card_text"
+        android:layout_width="match_parent"
+        android:layout_height="150px"
+        android:background="#478FA7"
+        android:alpha="0.6"
+        android:text="城市名"
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        android:paddingLeft="40px"
+        android:paddingTop="20px"/>
+    <View
+        android:layout_marginTop="20px"
+        android:layout_width="250px"
+        android:layout_height="2dip"
+        android:background="@android:color/white"
+        android:layout_marginLeft="20px"
+        android:alpha="0.8"></View>
+</LinearLayout>

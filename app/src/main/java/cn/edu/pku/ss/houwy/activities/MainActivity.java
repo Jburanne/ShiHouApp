@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView mSearchBtn;
     //定义关注城市按钮
     private ImageView mLikesBtn;
+    //定义未来天气按钮
+    private ImageView mFutureBtn;
 
     //定义relativelayout以实现背景切换
     private RelativeLayout RLbackground;
@@ -87,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSearchBtn.setOnClickListener(this);
         mLikesBtn = (ImageView) findViewById(R.id.bottom_navigation_likes);
         mLikesBtn.setOnClickListener(this);
+        mFutureBtn = (ImageView) findViewById(R.id.bottom_navigation_future);
+        mFutureBtn.setOnClickListener(this);
         initView();
 
 
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(this,CitySearchActivity.class);
             startActivityForResult(intent,1);
         }
-        else if(view.getId() == R.id.bottom_navigation_likes){
+        else if(view.getId() == R.id.bottom_navigation_future){
             //向未来天气页面传入当前城市数据
             Intent intent = new Intent(this,FutureWeather.class);
             Bundle bundle = new Bundle();
@@ -136,6 +140,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bundle.putSerializable("city",future_city);
             intent.putExtra("bundle",bundle);
             startActivity(intent);
+        }
+        else if(view.getId() == R.id.bottom_navigation_likes){
+            Intent intent = new Intent(this,CityLikes.class);
+            startActivityForResult(intent,2);
         }
     }
 
@@ -155,6 +163,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("myWeather","网络挂了");
                 Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
             }
+        }
+        if(requestCode == 2 && resultCode == RESULT_OK){
+            String newCityName = data.getStringExtra("like_city_name");
+            String newCityCode = myApplication.getInstance().getCityCode(newCityName);
+            queryWeatherCode(newCityCode);
         }
     }
 
