@@ -1,8 +1,10 @@
 package cn.edu.pku.ss.houwy.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +20,7 @@ import java.util.List;
 import cn.edu.pku.ss.houwy.app.MyApplication;
 import cn.edu.pku.ss.houwy.shihou.R;
 
-public class CityLikes extends AppCompatActivity implements View.OnClickListener{
+public class CityLikes extends AppCompatActivity implements View.OnClickListener,View.OnLongClickListener{
 
     private LayoutInflater inflater;
     private LinearLayout lin;
@@ -34,6 +36,7 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.city_likes);
         initViews();
+        initCities();
     }
     public void initViews(){
         inflater = LayoutInflater.from(this);
@@ -41,12 +44,16 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
         cityCardCount = 0;
         mAddCityBtn = (ImageView) findViewById(R.id.add_like_city);
         mAddCityBtn.setOnClickListener(this);
+    }
 
+    public void initCities(){
         //加载已关注的城市
-//        List<String> city = myApplication.getInstance().getCityLike();
-//        for(String item:city){
-//            addLikeCity(item);
-//        }
+        List<String> city = new ArrayList<>(myApplication.getInstance().getCityLike());
+        if(city.size() != 0){
+            for(String item:city){
+                addLikeCity(item);
+            }
+        }
     }
 
     public void addLikeCity(String cityName){
@@ -59,26 +66,31 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
                 textView.setId(R.id.like_city_1);
                 textView.setText(cityName);
                 textView.setOnClickListener(this);
+                textView.setOnLongClickListener(this);
                 break;
             case 2:
                 textView.setId(R.id.like_city_2);
                 textView.setText(cityName);
                 textView.setOnClickListener(this);
+                textView.setOnLongClickListener(this);
                 break;
             case 3:
                 textView.setId(R.id.like_city_3);
                 textView.setText(cityName);
                 textView.setOnClickListener(this);
+                textView.setOnLongClickListener(this);
                 break;
             case 4:
                 textView.setId(R.id.like_city_4);
                 textView.setText(cityName);
                 textView.setOnClickListener(this);
+                textView.setOnLongClickListener(this);
                 break;
             case 5:
                 textView.setId(R.id.like_city_5);
                 textView.setText(cityName);
                 textView.setOnClickListener(this);
+                textView.setOnLongClickListener(this);
                 break;
         }
 
@@ -89,16 +101,54 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
         if(v.getId() == R.id.like_city_1 || v.getId() == R.id.like_city_2 ||v.getId() == R.id.like_city_3
                 || v.getId() == R.id.like_city_4 || v.getId() == R.id.like_city_5){
             TextView t = (TextView) findViewById(v.getId());
-            Log.d("cityName",t.getText().toString());
+            //Log.d("cityName",t.getText().toString());
             Intent intent = new Intent(CityLikes.this,MainActivity.class).putExtra("like_city_name",t.getText().toString());
             setResult(RESULT_OK, intent);
             finish();
         }
         else if(v.getId() == R.id.add_like_city){
             Intent intent = new Intent(this,SearchFavouriteCity.class);
-            startActivityForResult(intent,1);
+            startActivity(intent);
+            //startActivityForResult(intent,1);
         }
 
+    }
+
+    //设置长按事件，当长按某个城市时，可以选择不再关注这个城市
+    @Override
+    public boolean onLongClick(View v) {
+        if(v.getId() == R.id.like_city_1 || v.getId() == R.id.like_city_2 ||v.getId() == R.id.like_city_3
+                || v.getId() == R.id.like_city_4 || v.getId() == R.id.like_city_5){
+            //获取点击的城市名
+            TextView t = (TextView) findViewById(v.getId());
+            final String city = t.getText().toString();
+            //设置提醒框
+            AlertDialog.Builder builder = new AlertDialog.Builder(CityLikes.this);
+            builder.setTitle("提醒");
+            //跳出提示语句
+            builder.setMessage("你确定不再关注"+city+"吗？");
+            //如果点击的是取消键
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //直接消掉dialog
+                }
+            });
+            //如果点击的是确定键
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    myApplication.getInstance().deleteCityLike(city);
+                    setContentView(R.layout.city_likes);
+                    initViews();
+                    initCities();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+        }
+        return true;
     }
 
     @Override
@@ -107,5 +157,13 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
             String cityName = data.getStringExtra("add_city_name");
             addLikeCity(cityName);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setContentView(R.layout.city_likes);
+        initViews();
+        initCities();
     }
 }

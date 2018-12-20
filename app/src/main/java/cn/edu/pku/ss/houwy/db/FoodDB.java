@@ -9,7 +9,7 @@ import java.util.List;
 
 public class FoodDB {
     public static final String FOOD_DB_NAME = "chooseFood.db";
-    private static final String FOOD_TABLE_NAME = "temp_food";
+    //private static final String FOOD_TABLE_NAME = "temp_food";
     private SQLiteDatabase db;
 
     public FoodDB(Context context, String path){
@@ -27,13 +27,5 @@ public class FoodDB {
         return paths;
     }
 
-    //搜索当前已关注的城市
-    public List<String> getFavouriteCity(){
-        List<String> city = new ArrayList<>();
-        Cursor c = db.rawQuery("SELECT cityname from city_likes",null);
-        while(c.moveToNext()){
-            city.add(c.getString(c.getColumnIndex("cityname")));
-        }
-        return city;
-    }
+
 }

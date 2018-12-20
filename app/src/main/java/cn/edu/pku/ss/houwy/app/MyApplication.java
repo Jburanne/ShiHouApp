@@ -14,12 +14,14 @@ import java.util.List;
 import cn.edu.pku.ss.houwy.bean.City;
 import cn.edu.pku.ss.houwy.db.CityDB;
 import cn.edu.pku.ss.houwy.db.FoodDB;
+import cn.edu.pku.ss.houwy.db.LikeDB;
 
 public class MyApplication extends Application {
     private static final String TAG = "MyAPP";
     private static MyApplication mApplication;
     private CityDB mCityDB;
     private FoodDB mFoodDB;
+    private LikeDB mLikeDB;
     private List<City> mCityList;
     private List<City> mResultList;
     private String cityCode;
@@ -30,6 +32,7 @@ public class MyApplication extends Application {
         mApplication = this;
         mCityDB = openCityDB();
         mFoodDB = openFoodDB();
+        mLikeDB = openLikeDB();
         initCityList();
     }
     private void initCityList(){
@@ -97,8 +100,25 @@ public class MyApplication extends Application {
     //返回当前关注的城市列表
     public List<String> getCityLike(){
         List<String> city = new ArrayList<>();
-        city = mFoodDB.getFavouriteCity();
+        city = mLikeDB.getFavouriteCity();
         return city;
+    }
+    //删除某个关注城市
+    public void deleteCityLike(String cityname){
+        mLikeDB.deleteFavouriteCity(cityname);
+    }
+    //查询城市是否已被关注
+    public boolean cityInList(String name){
+        return mLikeDB.cityInList(name);
+    }
+
+    //关注的城市数是否已达上限
+    public boolean cityNum(){
+        return mLikeDB.cityNum();
+    }
+
+    public void addCity(String name){
+        mLikeDB.addFavouriteCity(name);
     }
 
 
@@ -190,5 +210,45 @@ public class MyApplication extends Application {
             }
         }
         return new FoodDB(this, path);
+    }
+    private LikeDB openLikeDB() {
+        String path = "/data"
+                + Environment.getDataDirectory().getAbsolutePath
+                ()
+                + File.separator + getPackageName()
+                + File.separator + "databases1"
+                + File.separator
+                + LikeDB.Like_DB_NAME;
+        File db = new File(path);
+        Log.d(TAG, path);
+        if (!db.exists()) {
+            String pathfolder = "/data"
+                    + Environment.getDataDirectory().getAbsolutePath()
+                    + File.separator + getPackageName()
+                    + File.separator + "databases1"
+                    + File.separator;
+            File dirFirstFolder = new File(pathfolder);
+            if (!dirFirstFolder.exists()) {
+                dirFirstFolder.mkdirs();
+                Log.i("MyApp", "mkdirs");
+            }
+            Log.i("MyApp", "db is not exists");
+            try {
+                InputStream is = getAssets().open("LIKE.db");
+                FileOutputStream fos = new FileOutputStream(db);
+                int len = -1;
+                byte[] buffer = new byte[1024];
+                while ((len = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len);
+                    fos.flush();
+                }
+                fos.close();
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(0);
+            }
+        }
+        return new LikeDB(this, path);
     }
 }

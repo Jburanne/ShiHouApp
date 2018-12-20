@@ -78,35 +78,80 @@ public class SearchFavouriteCity extends AppCompatActivity implements SearchView
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //设置提醒框
-        AlertDialog.Builder builder = new AlertDialog.Builder(SearchFavouriteCity.this);
-        builder.setTitle("提醒");
+
 
         final String cityName;
 
         //获取点击位置的城市名
         cityName = String.valueOf(mAdapter.getItem(position));
         Log.d("cityName",cityName);
-        //跳出提示语句
-        builder.setMessage("你确定要添加"+cityName+"吗？");
-        //如果点击的是取消键
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //直接消掉dialog
-            }
-        });
-        //如果点击的是确定键
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent i = new Intent(SearchFavouriteCity.this,CityLikes.class).putExtra("add_city_name",cityName);
-                setResult(RESULT_OK, i);
-                finish();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        //如果城市已被关注，跳出提醒框
+        if(myApplication.getInstance().cityInList(cityName)){
+            //设置提醒框
+            AlertDialog.Builder builder = new AlertDialog.Builder(SearchFavouriteCity.this);
+            builder.setTitle("提醒");
+            //跳出提示语句
+            builder.setMessage("您已关注该城市");
+            //如果点击的是取消键
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //直接消掉dialog
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+        }
+        //如果已达上限，跳出提示框
+        else if(!myApplication.getInstance().cityNum()){
+            //设置提醒框
+            AlertDialog.Builder builder = new AlertDialog.Builder(SearchFavouriteCity.this);
+            builder.setTitle("提醒");
+            //跳出提示语句
+            builder.setMessage("关注城市数已达上限!");
+            //如果点击的是取消键
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //直接消掉dialog
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+        }
+        //否则，加入关注城市
+        else
+        {
+            //设置提醒框
+            AlertDialog.Builder builder = new AlertDialog.Builder(SearchFavouriteCity.this);
+            builder.setTitle("提醒");
+            //跳出提示语句
+            builder.setMessage("你确定要添加"+cityName+"吗？");
+            //如果点击的是取消键
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //直接消掉dialog
+                }
+            });
+            //如果点击的是确定键
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    myApplication.getInstance().addCity(cityName);
+//                    Intent i = new Intent(SearchFavouriteCity.this,CityLikes.class).putExtra("add_city_name",cityName);
+//                    setResult(RESULT_OK, i);
+                    finish();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+        }
+
+
 
     }
 }
