@@ -24,11 +24,13 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 
 import cn.edu.pku.ss.houwy.app.MyApplication;
 import cn.edu.pku.ss.houwy.bean.TodayWeather;
 import cn.edu.pku.ss.houwy.shihou.R;
 import cn.edu.pku.ss.houwy.util.NetUtil;
+import cn.edu.pku.ss.houwy.solarterms._24SolarTerms;
 
 import static cn.edu.pku.ss.houwy.util.NetUtil.parseXML;
 
@@ -64,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String future_city;
 
     private static MyApplication myApplication;
+
+    Calendar calendar = Calendar.getInstance();
 
 
     private Handler mHandler = new Handler() {
@@ -104,9 +108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
         }
 
+
     }
-
-
 
     @Override
     public void onClick(View view){
@@ -148,10 +151,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    //（CitySearchActivity销毁后，会回调这个方法）获取CitySearchActivity页面传来的citycode
+    //（接收intent的Activity销毁后，会回调这个方法）
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
 
+        //获取CitySearchActivity页面传来的citycode
         if(requestCode == 1 && resultCode == RESULT_OK){
             String newCityCode = data.getStringExtra("new_city_code");
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE){
@@ -164,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
             }
         }
+        //如果是从CityLikes传来的intent，加载被点击的城市的信息
         if(requestCode == 2 && resultCode == RESULT_OK){
             String newCityName = data.getStringExtra("like_city_name");
             String newCityCode = myApplication.getInstance().getCityCode(newCityName);
@@ -193,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         temperatureTv.setText("N/A");
     }
 
+    //根据天气类型，设置天气图标
     public void setWeatherImg(String type,ImageView imgView){
         switch(type){
             case "暴雪":
@@ -261,6 +267,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+    //根据节气匹配背景图片
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public void setFoodBg(TodayWeather todayWeather){
+        String[] solarterm = {"立春","雨水,","惊蛰","春分","清明","谷雨","立夏","小满","芒种","夏至",
+        "小暑","大暑","立秋","处暑","白露","秋分","寒露","霜降","立冬","小雪","大雪","冬至","小寒","大寒"};
+        //获取今日日期
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH)+1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        //日期的格式：月份是两位数，月份可以是两位或一位，如051（5月1日），0511（5月11日）
+        String date;
+        if(month < 10){
+            date = "0"+String.valueOf(month)+String.valueOf(day);
+        }else
+        {
+            date = String.valueOf(month)+String.valueOf(day);
+        }
+
+        String solarName = _24SolarTerms.getSolatName(year,date); //今日节气
+        int index = 0;
+        Class aClass = R.drawable.class;
+        String foodSrc = "";//背景图片路径
+
+        //设置背景图片，若今天不是某个节气，则按温度匹配图片，若今天是某个节气，则匹配该节气的传统食物
+        if(solarName == null){
+            foodSrc = myApplication.getInstance().getBackgroundByTemperature(todayWeather.getTemperature());
+        }else{
+            for(String str:solarterm){
+                if(solarName.equals(str)){
+                    //属于该节气，设置背景图片，图片标号为index
+                    foodSrc = "food_bg_"+index;
+                    break;
+                }
+                index++;
+            }
+        }
+        //设置背景图片
+        int foodId = -1;
+        try {
+            Field fField = aClass.getField(foodSrc);
+            Object mValue = fField.get(new Integer(0));
+            foodId = (int)mValue;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            Drawable drawable = getResources().getDrawable(foodId);
+            RLbackground.setBackground(drawable);
+        }
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void updateTodayWeather(TodayWeather todayWeather){
@@ -292,21 +348,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             cityImg.setImageDrawable(drawable);
         }
         //根据温度更新背景食物图片
-        String foodSrc = myApplication.getInstance().getBackgroundByTemperature(todayWeather.getTemperature());
-        int foodId = -1;
-        try {
-            Field fField = aClass.getField(foodSrc);
-            Object mValue = fField.get(new Integer(0));
-            foodId = (int)mValue;
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            Drawable drawable = getResources().getDrawable(foodId);
-            RLbackground.setBackground(drawable);
-        }
-
+        setFoodBg(todayWeather);
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
     }
 

@@ -117,6 +117,7 @@ public class MyApplication extends Application {
         return mLikeDB.cityNum();
     }
 
+    //增加关注的城市
     public void addCity(String name){
         mLikeDB.addFavouriteCity(name);
     }

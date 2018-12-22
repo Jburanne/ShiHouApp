@@ -56,11 +56,13 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
         }
     }
 
+    //动态增加布局：为每个新增的城市增加一个textview，加入到当前layout中
     public void addLikeCity(String cityName){
         cityCardCount++;
         LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.city_card,null).findViewById(R.id.add_city);
         lin.addView(layout);
         TextView textView = (TextView) findViewById(R.id.city_card_text);
+        //最多能关注5个城市，设置textview中的城市名，设置点击事件和长按事件
         switch (cityCardCount){
             case 1:
                 textView.setId(R.id.like_city_1);
@@ -102,6 +104,7 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
                 || v.getId() == R.id.like_city_4 || v.getId() == R.id.like_city_5){
             TextView t = (TextView) findViewById(v.getId());
             //Log.d("cityName",t.getText().toString());
+            //将点击的城市名传回主界面
             Intent intent = new Intent(CityLikes.this,MainActivity.class).putExtra("like_city_name",t.getText().toString());
             setResult(RESULT_OK, intent);
             finish();
@@ -138,7 +141,9 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    //在数据库表中删除该城市
                     myApplication.getInstance().deleteCityLike(city);
+                    //重新加载内容
                     setContentView(R.layout.city_likes);
                     initViews();
                     initCities();
@@ -159,6 +164,7 @@ public class CityLikes extends AppCompatActivity implements View.OnClickListener
         }
     }
 
+    //返回该活动时重新加载内容
     @Override
     protected void onResume() {
         super.onResume();
