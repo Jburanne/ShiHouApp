@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -31,8 +29,6 @@ import cn.edu.pku.ss.houwy.bean.TodayWeather;
 import cn.edu.pku.ss.houwy.shihou.R;
 import cn.edu.pku.ss.houwy.util.NetUtil;
 import cn.edu.pku.ss.houwy.solarterms._24SolarTerms;
-
-import static cn.edu.pku.ss.houwy.util.NetUtil.parseXML;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private static final int UPDATE_TODAY_WEATHER = 1;
@@ -66,9 +62,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String future_city;
 
     private static MyApplication myApplication;
-
+    //日历
     Calendar calendar = Calendar.getInstance();
-
 
     private Handler mHandler = new Handler() {
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -96,17 +91,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mFutureBtn = (ImageView) findViewById(R.id.bottom_navigation_future);
         mFutureBtn.setOnClickListener(this);
         initView();
-
-
-
-        if(NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE){
-            Log.d("myWeather","网络ok");
-            Toast.makeText(MainActivity.this,"网络Ok",Toast.LENGTH_LONG).show();
-        }
-        else{
-            Log.d("myWeather","网络挂了");
-            Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
-        }
+//
+//        if(NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE){
+//            Log.d("myWeather","网络ok");
+//            Toast.makeText(MainActivity.this,"网络Ok",Toast.LENGTH_LONG).show();
+//        }
+//        else{
+//            Log.d("myWeather","网络挂了");
+//            Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
+//        }
 
 
     }

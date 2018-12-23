@@ -8,7 +8,7 @@
     <application
         android:name="cn.edu.pku.ss.houwy.app.MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name="cn.edu.pku.ss.houwy.activities.CitySearchActivity" />
-        <activity android:name="cn.edu.pku.ss.houwy.MyApplication.MyApplication" />
+        <!--<activity android:name="cn.edu.pku.ss.houwy.MyApplication.MyApplication" />-->
         <activity android:name="cn.edu.pku.ss.houwy.activities.FutureWeather" />
         <activity android:name="cn.edu.pku.ss.houwy.activities.CityLikes" />
         <activity android:name="cn.edu.pku.ss.houwy.activities.SearchFavouriteCity"></activity>
