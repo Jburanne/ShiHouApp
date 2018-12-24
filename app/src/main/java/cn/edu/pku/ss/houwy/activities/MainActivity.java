@@ -10,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -26,6 +27,7 @@ import java.util.Calendar;
 
 import cn.edu.pku.ss.houwy.app.MyApplication;
 import cn.edu.pku.ss.houwy.bean.TodayWeather;
+import cn.edu.pku.ss.houwy.popwindow.NewPopwindow;
 import cn.edu.pku.ss.houwy.shihou.R;
 import cn.edu.pku.ss.houwy.util.NetUtil;
 import cn.edu.pku.ss.houwy.solarterms._24SolarTerms;
@@ -44,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView mLikesBtn;
     //定义未来天气按钮
     private ImageView mFutureBtn;
+    //定义分享按钮
+    private ImageView mShareBtn;
+    private NewPopwindow mPopwindow;
 
     //定义relativelayout以实现背景切换
     private RelativeLayout RLbackground;
@@ -90,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLikesBtn.setOnClickListener(this);
         mFutureBtn = (ImageView) findViewById(R.id.bottom_navigation_future);
         mFutureBtn.setOnClickListener(this);
+        mSearchBtn = (ImageView) findViewById(R.id.navigation_share_btn);
+        mSearchBtn.setOnClickListener(this);
         initView();
 //
 //        if(NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE){
@@ -140,6 +147,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if(view.getId() == R.id.bottom_navigation_likes){
             Intent intent = new Intent(this,CityLikes.class);
             startActivityForResult(intent,2);
+        }
+        else if(view.getId() == R.id.navigation_share_btn){
+            mPopwindow = new NewPopwindow(MainActivity.this,itemsOnClick);
+            mPopwindow.showAtLocation(view,Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
         }
     }
 
@@ -395,4 +406,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }).start();
     }
+
+    //为弹出窗口实现监听类
+    private View.OnClickListener itemsOnClick = new View.OnClickListener() {
+
+        public void onClick(View v) {
+            mPopwindow.dismiss();
+            mPopwindow.backgroundAlpha(MainActivity.this, 1f);
+            switch (v.getId()) {
+                case R.id.weixin:
+                    Toast.makeText(MainActivity.this, "微信", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.weibo:
+                    Toast.makeText(MainActivity.this, "微博", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.qq:
+                    Toast.makeText(MainActivity.this, "QQ", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    };
+
 }
